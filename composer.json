@@ -1,0 +1,41 @@
+{
+    "name": "boilerplate/boilerplate",
+    "description": "The boilerplate PHP framework",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Benjamin Altpeter",
+            "email": "kontakt@benjamin-altpeter.de",
+            "homepage": "https://benjamin-altpeter.de",
+            "role": "Developer"
+        },
+        {
+            "name": "Lorenz Sieben",
+            "email": "me@lorenz-sieben.com",
+            "homepage": "http://lorenz-sieben.com",
+            "role": "Developer"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "pear",
+            "url": "https://pear.php.net"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.0",
+        "myclabs/php-enum": "^1.4",
+        "pear-pear.php.net/Config_Lite": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "boilerplate\\": "lib/boilerplate/",
+            "boilerplate\\Core\\": "lib/boilerplate/Core/",
+            "boilerplate\\DataIo\\": "lib/boilerplate/DataIo/",
+            "boilerplate\\DataType\\": "lib/boilerplate/DataType/",
+            "boilerplate\\ExternalApi\\": "lib/boilerplate/ExternalApi/",
+            "boilerplate\\Utility\\": "lib/boilerplate/Utility/"
+        }
+    }
+}
