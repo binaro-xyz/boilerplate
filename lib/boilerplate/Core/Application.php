@@ -4,7 +4,7 @@ namespace boilerplate\Core;
 
 // PHP doesn't allow the use of expressions in the definition of a const, therefore we have to use this
 // see: http://stackoverflow.com/a/2787565
-define('rootdir', __DIR__ . '/../../..');
+define('rootdir', \ComposerLocator::getRootPath());
 define('libdir', Application::ROOT_DIR . '/lib');
 define('composerdir', Application::ROOT_DIR . '/vendor');
 define('configfile', Application::ROOT_DIR . '/config.ini');

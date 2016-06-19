@@ -26,7 +26,8 @@
     "require": {
         "php": ">=7.0.0",
         "myclabs/php-enum": "^1.4",
-        "pear-pear.php.net/Config_Lite": "*"
+        "pear-pear.php.net/Config_Lite": "*",
+        "mindplay/composer-locator": "^2.1"
     },
     "autoload": {
         "psr-4": {
