@@ -16,6 +16,6 @@ class Application {
 
     const CONFIG_FILE = configfile;
 
-    const VERSION_TEXT = '0.0.1-alpha';
+    const VERSION_TEXT = '0.1.0';
     const VERSION_CODE = 1;
 }

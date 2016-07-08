@@ -92,4 +92,20 @@ class DatabaseConnection {
     public function writeConfigValue(string $property, $value) : bool {
         return $this->query('UPDATE config SET value = :value WHERE property LIKE :property', array('property' => $property, 'value' => $value));
     }
+
+    public function insertUser(string $username, string $passwd_hash, string $name, string $email) : int {
+        $this->query('INSERT INTO users (username, passwd_hash, name, email) VALUES (:username, :passwd_hash, :name, :email)',
+            array('username' => $username, 'passwd_hash' => $passwd_hash, 'name' => $name, 'email' => $email));
+        return (int)$this->pdo->lastInsertId();
+    }
+
+    public function getUserByUsername(string $username) : array {
+        if($result = $this->fetchValue('SELECT * FROM users WHERE username = :username', array('username' => $username))) {
+            return $result;
+        }
+        else {
+            // TODO: Throw error
+            return false;
+        }
+    }
 }
