@@ -79,7 +79,7 @@ class DatabaseConnection {
 
     // Generally, these functions should not be accessed directly but rather be proxied by a more specific class.
 
-    public function readConfigValue(string $property) : string {
+    public function readConfigValue(string $property) {
         if($result = $this->fetchValue('SELECT value FROM config WHERE property LIKE :property', array('property' => $property))) {
             return $result;
         }
@@ -94,13 +94,18 @@ class DatabaseConnection {
     }
 
     public function insertUser(string $username, string $passwd_hash, string $name, string $email) : int {
-        $this->query('INSERT INTO users (username, passwd_hash, name, email) VALUES (:username, :passwd_hash, :name, :email)',
-            array('username' => $username, 'passwd_hash' => $passwd_hash, 'name' => $name, 'email' => $email));
-        return (int)$this->pdo->lastInsertId();
+        if($this->query('INSERT INTO users (username, passwd_hash, name, email) VALUES (:username, :passwd_hash, :name, :email)',
+            array('username' => $username, 'passwd_hash' => $passwd_hash, 'name' => $name, 'email' => $email)))
+        {
+            return (int)$this->pdo->lastInsertId();
+        }
+        else {
+            return -1;
+        }
     }
 
-    public function getUserByUsername(string $username) : array {
-        if($result = $this->fetchValue('SELECT * FROM users WHERE username = :username', array('username' => $username))) {
+    public function getUserById(int $id) {
+        if($result = $this->fetch('SELECT * FROM users WHERE id = :id', array('id' => $id))) {
             return $result;
         }
         else {
@@ -109,13 +114,27 @@ class DatabaseConnection {
         }
     }
 
+    public function getUserByUsername(string $username) {
+        if($result = $this->fetch('SELECT * FROM users WHERE username = :username', array('username' => $username))) {
+            return $result;
+        }
+        else {
+            // TODO: Throw error
+            return false;
+        }
+    }
+
+    public function deleteUserWithId(int $id) : bool {
+        return $this->query('DELETE FROM users WHERE id = :id', array('id' => $id));
+    }
+
     public function addFile(string $filename, string $extension, string $context, string $uuid) : int {
         $this->query('INSERT INTO files (filename, extension, context, uuid, date_added) VALUES (:filename, :extension, :context, :uuid, NOW())',
             array('filename' => $filename, 'extension' => $extension, 'context' => $context, 'uuid' => $uuid));
         return (int)$this->pdo->lastInsertId();
     }
 
-    public function getFileWithId(int $id) : array {
+    public function getFileWithId(int $id) {
         if($result = $this->fetch('SELECT * FROM files WHERE id = :id', array('id' => $id))) {
             return $result;
         }

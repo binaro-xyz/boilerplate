@@ -78,10 +78,11 @@ class File {
      * actual object methods
      */
 
-    public function delete() {
+    public function delete() : bool {
         $path = File::getFullFilePath($this->uuid, $this->context);
         $this->db_con->deleteFileWithId($this->id);
         unlink($path);
+        return true;
     }
 
     // if $download_file_name is an empty string, the original file name at the time of the upload will be used
