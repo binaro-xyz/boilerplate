@@ -1,4 +1,5 @@
 <?php
+// TODO: Discussion, should we rather follow our own function naming guidelines here or the way PHP names the functions, e.g. varDumpPre() or var_dump_pre()?
 
 function varDumpPre($expression) {
     echo '<pre>';
