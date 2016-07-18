@@ -11,7 +11,7 @@ class Utility
     }
 
     // see https://secure.php.net/manual/en/function.var-dump.php#51119
-    public static function varDumpReturn($expression) {
+    public static function varDumpReturn($expression) : string {
         ob_start();
         var_dump($expression);
         $return = ob_get_contents();

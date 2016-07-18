@@ -3,16 +3,16 @@
 namespace boilerplate\Utility;
 
 use baltpeter\Utility\PasswordHash;
+use boilerplate\Core\Application;
 use boilerplate\Core\User;
-use boilerplate\DataIo\DatabaseConnection;
 
 class UserManager
 {
     private $db_con;
 
-    public function __construct($db_con = null)
+    public function __construct()
     {
-        $this->db_con = $db_con == null ? new DatabaseConnection() : $db_con;
+        $this->db_con = Application::instance()->db_con;
     }
 
     public function addUser(string $username, string $password, string $name, string $email) : int

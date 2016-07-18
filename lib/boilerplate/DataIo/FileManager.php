@@ -2,6 +2,7 @@
 
 namespace boilerplate\DataIo;
 
+use boilerplate\Core\Application;
 use boilerplate\Core\Configuration;
 use boilerplate\Core\ConfigurationOption;
 use boilerplate\DataType\File;
@@ -12,8 +13,8 @@ class FileManager
     private $config;
 
     public function __construct() {
-        $this->db_con = new DatabaseConnection();
-        $this->config = new Configuration(true, $this->db_con);
+        $this->db_con = Application::instance()->db_con;
+        $this->config = Application::instance()->config;
     }
 
     // $files_array is the PHP $_FILES
@@ -28,12 +29,12 @@ class FileManager
 
         if(!move_uploaded_file($files_array[$field_name]['tmp_name'], $file_path)) {
             // TODO: Throw error
-            return -1;
+            return new File(-1, '', '', '', '', '');
         }
 
         $id = $this->db_con->addFile(pathinfo($files_array[$field_name]['name'], PATHINFO_FILENAME), pathinfo($files_array[$field_name]['name'], PATHINFO_EXTENSION),
             $context, $uuid);
-        return new File($id, pathinfo($files_array[$field_name]['name'], PATHINFO_FILENAME), pathinfo($files_array[$field_name]['name'], PATHINFO_EXTENSION), $context, $uuid, null);
+        return new File($id, pathinfo($files_array[$field_name]['name'], PATHINFO_FILENAME), pathinfo($files_array[$field_name]['name'], PATHINFO_EXTENSION), $context, $uuid, '');
     }
 
     public function deleteFileWithId(int $id) {
@@ -53,7 +54,7 @@ class FileManager
 
     private function generateUuid(string $context) {
         // see http://rogerstringer.com/2013/11/15/generate-uuids-php/
-        $uuid = sprintf('%04x%04x%04x%04x%04x%04x%04x%04x',
+        @$uuid = sprintf('%04x%04x%04x%04x%04x%04x%04x%04x',
             mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff),
             mt_rand(0x0fff) | 0x4000,
             mt_rand(0x3fff) | 0x8000,
