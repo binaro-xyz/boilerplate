@@ -35,6 +35,9 @@
         "baltpeter/password-hashing-pbkdf2": "*"
     },
     "autoload": {
+        "files": [
+            "lib/boilerplate/helpers.php"
+        ],
         "psr-4": {
             "boilerplate\\": "lib/boilerplate/",
             "boilerplate\\Core\\": "lib/boilerplate/Core/",
