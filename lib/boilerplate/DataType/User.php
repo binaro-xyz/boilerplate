@@ -1,8 +1,9 @@
 <?php
 
-namespace boilerplate\Core;
+namespace boilerplate\DataType;
 
 use baltpeter\Utility\PasswordHash;
+use boilerplate\Core\Application;
 
 class User {
     private $id;
