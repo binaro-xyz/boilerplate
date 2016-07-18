@@ -13,6 +13,7 @@ class ConfigurationOption extends Enum {
     const DEBUGGING_ENABLED = array('property' => 'debugging_enabled', 'source' => 'ini');
 
     const BASE_URL = array('property' => 'base_url', 'source' => 'db');
+    const FILE_DIR = array('property' => 'file_dir', 'source' => 'db');
 }
 
 class Configuration {
@@ -42,6 +43,9 @@ class Configuration {
         switch($option['property']) {
             case 'base_url':
                 $value = rtrim($value, '/');
+                break;
+            case 'file_dir':
+                $value = rtrim(Application::ROOT_DIR . '/' . $value, '/');
                 break;
             case 'debugging_enabled':
                 $value = (bool)$value;

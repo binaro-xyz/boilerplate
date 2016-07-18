@@ -108,4 +108,24 @@ class DatabaseConnection {
             return false;
         }
     }
+
+    public function addFile(string $filename, string $extension, string $context, string $uuid) : int {
+        $this->query('INSERT INTO files (filename, extension, context, uuid, date_added) VALUES (:filename, :extension, :context, :uuid, NOW())',
+            array('filename' => $filename, 'extension' => $extension, 'context' => $context, 'uuid' => $uuid));
+        return (int)$this->pdo->lastInsertId();
+    }
+
+    public function getFileWithId(int $id) : array {
+        if($result = $this->fetch('SELECT * FROM files WHERE id = :id', array('id' => $id))) {
+            return $result;
+        }
+        else {
+            // TODO: Throw error
+            return false;
+        }
+    }
+
+    public function deleteFileWithId(int $id) : bool {
+        return $this->query('DELETE FROM files WHERE id = :id', array('id' => $id));
+    }
 }
