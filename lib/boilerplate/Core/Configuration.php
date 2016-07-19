@@ -17,8 +17,8 @@ class ConfigurationOption extends Enum {
 }
 
 class Configuration {
-    private $ini;
-    private $db_con;
+    protected $ini;
+    protected $db_con;
 
     public function __construct(bool $enable_db = true, DatabaseConnection $db_con = null) {
         $this->ini = new \Config_Lite(Application::CONFIG_FILE, LOCK_EX);
@@ -66,7 +66,7 @@ class Configuration {
         }
     }
 
-    private function getDatabaseValue(string $property) {
+    protected function getDatabaseValue(string $property) {
         if($this->db_con == null) {
             // TODO: Throw error
             return false;
@@ -75,11 +75,11 @@ class Configuration {
         return $this->db_con->readConfigValue($property) ?? false;
     }
 
-    private function getIniValue(string $property) {
+    protected function getIniValue(string $property) {
         return $this->ini[$property];
     }
 
-    private function setDatabaseValue(string $property, $value) : bool {
+    protected function setDatabaseValue(string $property, $value) : bool {
         if($this->db_con == null) {
             // TODO: Throw error
             return false;
@@ -88,7 +88,7 @@ class Configuration {
         return $this->db_con->writeConfigValue($property, $value);
     }
 
-    private function setIniValue(string $property, $value) : bool {
+    protected function setIniValue(string $property, $value) : bool {
         $this->ini[$property] = (string)$value;
         return $this->ini->save();
     }

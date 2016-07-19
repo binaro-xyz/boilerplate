@@ -16,8 +16,8 @@ class File {
 
     public $error = null; // TODO: Decide if this should be an error code or an error message
 
-    private $db_con;
-    private $config;
+    protected $db_con;
+    protected $config;
 
     /*
      * these are the different constructors, implemented via static methods due to PHP's limitations
@@ -104,15 +104,15 @@ class File {
      * static helper functions
      */
 
-    private static function getDirForContext(string $context) : string {
+    protected static function getDirForContext(string $context) : string {
         return Application::instance()->config->get(ConfigurationOption::FILE_DIR) . '/' . $context;
     }
 
-    private static function getFullFilePath(string $uuid, string $context) : string {
+    protected static function getFullFilePath(string $uuid, string $context) : string {
         return File::getDirForContext($context) . '/' . $uuid;
     }
 
-    private static function generateUuid(string $context) : string {
+    protected static function generateUuid(string $context) : string {
         // see http://rogerstringer.com/2013/11/15/generate-uuids-php/
         @$uuid = sprintf('%04x%04x%04x%04x%04x%04x%04x%04x',
             mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff),

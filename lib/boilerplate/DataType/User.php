@@ -8,11 +8,11 @@ use boilerplate\Core\Application;
 class User {
     private $id;
     public $username;
-    private $passwd_hash;
+    protected $passwd_hash;
     public $name;
     public $email;
 
-    private $authenticated = false;
+    protected $authenticated = false;
 
     /*
      * these are the different constructors, implemented via static methods due to PHP's limitations

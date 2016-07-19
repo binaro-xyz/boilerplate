@@ -6,8 +6,8 @@ use boilerplate\Core\Configuration;
 use boilerplate\Core\ConfigurationOption;
 
 class DatabaseConnection {
-    private $pdo;
-    private $config;
+    protected $pdo;
+    protected $config;
 
     public function __construct() {
         $this->config = new Configuration(false);
@@ -25,7 +25,7 @@ class DatabaseConnection {
         }
     }
 
-    private function query(string $statement, array $args = array()) : bool {
+    protected function query(string $statement, array $args = array()) : bool {
         try {
             $query = $this->pdo->prepare($statement);
             $query->execute($args);
@@ -38,7 +38,7 @@ class DatabaseConnection {
         return true;
     }
 
-    private function fetch(string $statement, array $args = array()) {
+    protected function fetch(string $statement, array $args = array()) {
         try {
             $query = $this->pdo->prepare($statement);
             $query->execute($args);
@@ -51,7 +51,7 @@ class DatabaseConnection {
         }
     }
 
-    private function fetchValue(string $statement, array $args = array()) {
+    protected function fetchValue(string $statement, array $args = array()) {
         try {
             $query = $this->pdo->prepare($statement);
             $query->execute($args);
@@ -64,7 +64,7 @@ class DatabaseConnection {
         }
     }
 
-    private function fetchAll(string $statement, array $args = array()) {
+    protected function fetchAll(string $statement, array $args = array()) {
         try {
             $query = $this->pdo->prepare($statement);
             $query->execute($args);
