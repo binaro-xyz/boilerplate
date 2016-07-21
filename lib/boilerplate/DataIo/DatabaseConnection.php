@@ -43,7 +43,8 @@ class DatabaseConnection {
             $query = $this->pdo->prepare($statement);
             $query->execute($args);
 
-            return $query->fetch(\PDO::FETCH_ASSOC);
+            if($result = $query->fetch(\PDO::FETCH_ASSOC)) return $result;
+            else return false; // TODO: Throw error
         }
         catch(\PDOException $e) {
             // TODO: Throw error
@@ -56,7 +57,8 @@ class DatabaseConnection {
             $query = $this->pdo->prepare($statement);
             $query->execute($args);
 
-            return $query->fetch(\PDO::FETCH_COLUMN);
+            if($result = $query->fetch(\PDO::FETCH_COLUMN)) return $result;
+            else return false; // TODO: Throw error
         }
         catch(\PDOException $e) {
             // TODO: Throw error
@@ -69,7 +71,8 @@ class DatabaseConnection {
             $query = $this->pdo->prepare($statement);
             $query->execute($args);
 
-            return $query->fetchAll(\PDO::FETCH_ASSOC);
+            if($result = $query->fetchAll(\PDO::FETCH_ASSOC)) return $result;
+            else return false; // TODO: Throw error
         }
         catch(\PDOException $e) {
             // TODO: Throw error
@@ -80,13 +83,7 @@ class DatabaseConnection {
     // Generally, these functions should not be accessed directly but rather be proxied by a more specific class.
 
     public function readConfigValue(string $property) {
-        if($result = $this->fetchValue('SELECT value FROM config WHERE property LIKE :property', array('property' => $property))) {
-            return $result;
-        }
-        else {
-            // TODO: Throw error
-            return false;
-        }
+        return $this->fetchValue('SELECT value FROM config WHERE property LIKE :property', array('property' => $property));
     }
 
     public function writeConfigValue(string $property, $value) : bool {
@@ -105,23 +102,11 @@ class DatabaseConnection {
     }
 
     public function getUserById(int $id) {
-        if($result = $this->fetch('SELECT * FROM users WHERE id = :id', array('id' => $id))) {
-            return $result;
-        }
-        else {
-            // TODO: Throw error
-            return false;
-        }
+        return $this->fetch('SELECT * FROM users WHERE id = :id', array('id' => $id));
     }
 
     public function getUserByUsername(string $username) {
-        if($result = $this->fetch('SELECT * FROM users WHERE username = :username', array('username' => $username))) {
-            return $result;
-        }
-        else {
-            // TODO: Throw error
-            return false;
-        }
+        return $this->fetch('SELECT * FROM users WHERE username = :username', array('username' => $username));
     }
 
     public function deleteUserWithId(int $id) : bool {
@@ -135,13 +120,7 @@ class DatabaseConnection {
     }
 
     public function getFileWithId(int $id) {
-        if($result = $this->fetch('SELECT * FROM files WHERE id = :id', array('id' => $id))) {
-            return $result;
-        }
-        else {
-            // TODO: Throw error
-            return false;
-        }
+        return $this->fetch('SELECT * FROM files WHERE id = :id', array('id' => $id));
     }
 
     public function deleteFileWithId(int $id) : bool {
