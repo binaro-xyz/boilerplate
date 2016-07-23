@@ -32,7 +32,7 @@ class DatabaseConnection {
         }
         catch(\PDOException $e) {
             // TODO: Throw error
-            return false;
+            return null;
         }
 
         return true;
@@ -44,11 +44,11 @@ class DatabaseConnection {
             $query->execute($args);
 
             if($result = $query->fetch(\PDO::FETCH_ASSOC)) return $result;
-            else return false; // TODO: Throw error
+            else return null; // TODO: Throw error
         }
         catch(\PDOException $e) {
             // TODO: Throw error
-            return false;
+            return null;
         }
     }
 
@@ -58,11 +58,11 @@ class DatabaseConnection {
             $query->execute($args);
 
             if($result = $query->fetch(\PDO::FETCH_COLUMN)) return $result;
-            else return false; // TODO: Throw error
+            else return null; // TODO: Throw error
         }
         catch(\PDOException $e) {
             // TODO: Throw error
-            return false;
+            return null;
         }
     }
 
@@ -72,11 +72,11 @@ class DatabaseConnection {
             $query->execute($args);
 
             if($result = $query->fetchAll(\PDO::FETCH_ASSOC)) return $result;
-            else return false; // TODO: Throw error
+            else return null; // TODO: Throw error
         }
         catch(\PDOException $e) {
             // TODO: Throw error
-            return false;
+            return null;
         }
     }
 
