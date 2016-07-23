@@ -50,14 +50,13 @@ class File {
     // $files_array is the PHP $_FILES
     public static function fromUpload(string $context, array $files_array, string $field_name = 'file') : File {
         $uuid = File::generateUuid($context);
-
         $dir_for_context = File::getDirForContext($context);
-        if (!is_dir($dir_for_context)) {
+        if(!is_dir($dir_for_context)) {
             mkdir($dir_for_context, 0750, true);
         }
         $file_path = $dir_for_context . '/' . $uuid;
 
-        if (!move_uploaded_file($files_array[$field_name]['tmp_name'], $file_path)) {
+        if(!move_uploaded_file($files_array[$field_name]['tmp_name'], $file_path)) {
             // TODO: Throw error
             return File::errorFile('Uploading file failed, PHP error code: ' . $files_array[$field_name]['error']);
         }
@@ -80,6 +79,40 @@ class File {
         }
 
         return $return;
+    }
+
+    public static function fromDataString(string $data_string, string $filename, string $extension, string $context) : File {
+        $uuid = File::generateUuid($context);
+        $dir_for_context = File::getDirForContext($context);
+        if(!is_dir($dir_for_context)) {
+            mkdir($dir_for_context, 0750, true);
+        }
+        $file_path = $dir_for_context . '/' . $uuid;
+
+        if(!file_put_contents($file_path, $data_string)) {
+            // TODO: Throw error
+            return File::errorFile('Storing data string to file failed.');
+        }
+
+        $id = Application::instance()->db_con->addFile($filename, $extension, $context, $uuid);
+        return File::fromId($id);
+    }
+
+    public static function fromFilesystemFile(string $original_file_path, string $context) : File {
+        $uuid = File::generateUuid($context);
+        $dir_for_context = File::getDirForContext($context);
+        if(!is_dir($dir_for_context)) {
+            mkdir($dir_for_context, 0750, true);
+        }
+        $file_path = $dir_for_context . '/' . $uuid;
+
+        if(!copy($original_file_path, $file_path)) {
+            // TODO: Throw error
+            return File::errorFile('Copying file failed.');
+        }
+
+        $id = Application::instance()->db_con->addFile(pathinfo($original_file_path, PATHINFO_FILENAME), pathinfo($original_file_path, PATHINFO_EXTENSION), $context, $uuid);
+        return File::fromId($id);
     }
 
     // this is the file that will be returned in case of an error
