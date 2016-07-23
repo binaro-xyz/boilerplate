@@ -67,6 +67,21 @@ class File {
         return File::fromId($id);
     }
 
+    /**
+     * @param array $files_array The PHP $_FILES array
+     * @return File[]
+     */
+    public static function fromMultipleUpload(string $context, array $files_array, string $field_name = 'file') : array {
+        $files_array = File::normalize_files_array($files_array);
+        $return = array();
+
+        for($i = 0; $i < @count($files_array[$field_name]); $i++) {
+            $return[] = File::fromUpload($context, $files_array[$field_name], $i);
+        }
+
+        return $return;
+    }
+
     // this is the file that will be returned in case of an error
     public static function errorFile($error) : File {
         $file = new File(-1, '', '', '', '', '');
@@ -124,5 +139,29 @@ class File {
         $possible_duplicate = glob(File::getDirForContext($context) . '/' . $uuid);
 
         return count($possible_duplicate) > 0 ? File::generateUuid($context) : $uuid;
+    }
+
+    // taken from https://php.net/manual/en/features.file-upload.post-method.php#118858
+    protected static function normalize_files_array($files_array = array()) {
+        $normalized_array = array();
+
+        foreach($files_array as $index => $file) {
+            if(!is_array($file['name'])) {
+                $normalized_array[$index][] = $file;
+                continue;
+            }
+
+            foreach($file['name'] as $idx => $name) {
+                $normalized_array[$index][$idx] = [
+                    'name' => $name,
+                    'type' => $file['type'][$idx],
+                    'tmp_name' => $file['tmp_name'][$idx],
+                    'error' => $file['error'][$idx],
+                    'size' => $file['size'][$idx]
+                ];
+            }
+        }
+
+        return $normalized_array;
     }
 }
