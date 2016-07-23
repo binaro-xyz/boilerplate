@@ -111,6 +111,14 @@ class File {
         readfile($file);
     }
 
+    public function view() {
+        $file = $this->getFilePath();
+
+        header('Content-Type: ' . finfo_file(finfo_open(FILEINFO_MIME_TYPE), $file));
+        header('Content-Length: ' . filesize($file));
+        readfile($file);
+    }
+
     public function getFilePath() : string {
         return File::getFullFilePath($this->uuid, $this->context);
     }
