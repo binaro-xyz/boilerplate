@@ -156,6 +156,10 @@ class File {
         return File::getFullFilePath($this->uuid, $this->context);
     }
 
+    public function getMimeType() : string {
+        return finfo_file(finfo_open(FILEINFO_MIME_TYPE), $this->getFilePath());
+    }
+
     /*
      * static helper functions
      */
