@@ -90,6 +90,14 @@ class DatabaseConnection {
         return $this->query('UPDATE config SET value = :value WHERE property LIKE :property', array('property' => $property, 'value' => $value));
     }
 
+    public function getMetaValue(string $property) : string {
+        return $this->fetchValue('SELECT value FROM meta WHERE property = :property', array('property' => $property)) ?? '';
+    }
+
+    public function setMetaValue(string $property, string $value) : bool {
+        return $this->query('REPLACE INTO meta SET property = :property, value = :value', array('property' => $property, 'value' => $value));
+    }
+
     public function insertUser(string $username, string $passwd_hash, string $name, string $email) : int {
         if($this->query('INSERT INTO users (username, passwd_hash, name, email) VALUES (:username, :passwd_hash, :name, :email)',
             array('username' => $username, 'passwd_hash' => $passwd_hash, 'name' => $name, 'email' => $email)))
