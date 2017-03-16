@@ -42,7 +42,8 @@ class File {
             return new File($db_result['id'], $db_result['filename'], $db_result['extension'], $db_result['context'], $db_result['uuid'], $db_result['date_added']);
         }
         else {
-            // TODO: Throw error
+            Application::instance()->logger->error('Tried to fetch file from ID but failed.',
+                array('id' => $id));
             return File::errorFile('Fetching file with ID ' . $id . ' from database failed.');
         }
     }
@@ -57,7 +58,8 @@ class File {
         $file_path = $dir_for_context . '/' . $uuid;
 
         if(!move_uploaded_file($files_array[$field_name]['tmp_name'], $file_path)) {
-            // TODO: Throw error
+            Application::instance()->logger->error('Tried to move uploaded file but failed.',
+                array('$_FILES' => $files_array, 'field_name' => $field_name, 'file_path' => $file_path));
             return File::errorFile('Uploading file failed, PHP error code: ' . $files_array[$field_name]['error']);
         }
 
@@ -90,7 +92,8 @@ class File {
         $file_path = $dir_for_context . '/' . $uuid;
 
         if(!file_put_contents($file_path, $data_string)) {
-            // TODO: Throw error
+            Application::instance()->logger->error('Tried to write data string to disk but failed.',
+                array('data_string' => $data_string, 'file_path' => $file_path));
             return File::errorFile('Storing data string to file failed.');
         }
 
@@ -107,7 +110,8 @@ class File {
         $file_path = $dir_for_context . '/' . $uuid;
 
         if(!copy($original_file_path, $file_path)) {
-            // TODO: Throw error
+            Application::instance()->logger->error('Tried to copy file from filesystem but failed.',
+                array('original_file' => $original_file_path, 'target_path' => $file_path));
             return File::errorFile('Copying file failed.');
         }
 

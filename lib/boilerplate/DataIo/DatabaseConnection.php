@@ -2,6 +2,7 @@
 
 namespace boilerplate\DataIo;
 
+use boilerplate\Core\Application;
 use boilerplate\Core\Configuration;
 use boilerplate\Core\ConfigurationOption;
 
@@ -19,9 +20,8 @@ class DatabaseConnection {
             if($this->config->get(ConfigurationOption::DEBUGGING_ENABLED)) { $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING); }
         }
         catch(\PDOException $e) {
-            // TODO: Throw error
-            echo $e->getMessage();
-            // $e->getMessage(); $this->pdo->errorCode(); $this->pdo->errorInfo();
+            Application::instance()->logger->error('Tried to initalize connection to the database but PDOException occurred.',
+                array('message' => $e->getMessage(), 'error_code' => $this->pdo->errorCode(), 'error_info' => $this->pdo->errorInfo()));
         }
     }
 
@@ -31,7 +31,8 @@ class DatabaseConnection {
             $query->execute($args);
         }
         catch(\PDOException $e) {
-            // TODO: Throw error
+            Application::instance()->logger->error('Tried to query database but PDOException occurred.',
+                array('statement' => $statement, 'args' => $args, 'exception' => $e));
             return null;
         }
 
@@ -44,10 +45,15 @@ class DatabaseConnection {
             $query->execute($args);
 
             if($result = $query->fetch(\PDO::FETCH_ASSOC)) return $result;
-            else return null; // TODO: Throw error
+            else {
+                Application::instance()->logger->error('Tried to fetch from database but result is null.',
+                    array('statement' => $statement, 'args' => $args, 'result' => $result));
+                return null;
+            }
         }
         catch(\PDOException $e) {
-            // TODO: Throw error
+            Application::instance()->logger->error('Tried to fetch from database but PDOException occurred.',
+                    array('statement' => $statement, 'args' => $args, 'exception' => $e));
             return null;
         }
     }
@@ -58,10 +64,15 @@ class DatabaseConnection {
             $query->execute($args);
 
             if($result = $query->fetch(\PDO::FETCH_COLUMN)) return $result;
-            else return null; // TODO: Throw error
+            else {
+                Application::instance()->logger->error('Tried to fetch database value but result is null.',
+                    array('statement' => $statement, 'args' => $args, 'result' => $result));
+                return null;
+            }
         }
         catch(\PDOException $e) {
-            // TODO: Throw error
+            Application::instance()->logger->error('Tried to fetch database value but PDOException occurred.',
+                    array('statement' => $statement, 'args' => $args, 'exception' => $e));
             return null;
         }
     }
@@ -72,10 +83,15 @@ class DatabaseConnection {
             $query->execute($args);
 
             if($result = $query->fetchAll(\PDO::FETCH_ASSOC)) return $result;
-            else return null; // TODO: Throw error
+            else {
+                Application::instance()->logger->error('Tried to fetch all from database but result is null.',
+                    array('statement' => $statement, 'args' => $args, 'result' => $result));
+                return null;
+            }
         }
         catch(\PDOException $e) {
-            // TODO: Throw error
+            Application::instance()->logger->error('Tried to fetch all from database but PDOException occurred.',
+                    array('statement' => $statement, 'args' => $args, 'exception' => $e));
             return null;
         }
     }

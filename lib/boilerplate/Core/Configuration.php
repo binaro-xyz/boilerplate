@@ -68,7 +68,7 @@ class Configuration {
 
     protected function getDatabaseValue(string $property) {
         if($this->db_con == null) {
-            // TODO: Throw error
+            Application::instance()->logger->error('Tried to get database value but no database initialized.', array('property' => $property));
             return false;
         }
 
@@ -81,7 +81,7 @@ class Configuration {
 
     protected function setDatabaseValue(string $property, $value) : bool {
         if($this->db_con == null) {
-            // TODO: Throw error
+            Application::instance()->logger->error('Tried to write database value but no database initialized.', array('property' => $property, 'value' => $value));
             return false;
         }
 
