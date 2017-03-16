@@ -32,7 +32,8 @@
         "myclabs/php-enum": "^1.4",
         "pear-pear.php.net/Config_Lite": "*",
         "mindplay/composer-locator": "^2.1",
-        "baltpeter/password-hashing-pbkdf2": "*"
+        "baltpeter/password-hashing-pbkdf2": "*",
+        "monolog/monolog": "^1.22"
     },
     "autoload": {
         "files": [
