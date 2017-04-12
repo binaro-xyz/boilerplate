@@ -119,6 +119,24 @@ class File {
         return File::fromId($id);
     }
 
+    public static function fromUrl(string $url, string $filename, string $extension, string $context) : File {
+        $uuid = File::generateUuid($context);
+        $dir_for_context = File::getDirForContext($context);
+        if(!is_dir($dir_for_context)) {
+            mkdir($dir_for_context, 0750, true);
+        }
+        $file_path = $dir_for_context . '/' . $uuid;
+
+        if(!file_put_contents($file_path, fopen($url, 'r'))) {
+            Application::instance()->logger->error('Tried to download file from URL but failed.',
+                array('url' => $url, 'file_path' => $file_path));
+            return File::errorFile('Storing file from URL to file failed.');
+        }
+
+        $id = Application::instance()->db_con->addFile($filename, $extension, $context, $uuid);
+        return File::fromId($id);
+    }
+
     // this is the file that will be returned in case of an error
     public static function errorFile($error) : File {
         $file = new File(-1, '', '', '', '', '');
