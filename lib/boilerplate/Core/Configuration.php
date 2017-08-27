@@ -13,11 +13,12 @@ class ConfigurationOption extends Enum {
     const DEBUGGING_ENABLED = array('property' => 'debugging_enabled', 'source' => 'ini');
 
     const BASE_URL = array('property' => 'base_url', 'source' => 'db');
+    const FILE_DIR = array('property' => 'file_dir', 'source' => 'db');
 }
 
 class Configuration {
-    private $ini;
-    private $db_con;
+    protected $ini;
+    protected $db_con;
 
     public function __construct(bool $enable_db = true, DatabaseConnection $db_con = null) {
         $this->ini = new \Config_Lite(Application::CONFIG_FILE, LOCK_EX);
@@ -43,6 +44,9 @@ class Configuration {
             case 'base_url':
                 $value = rtrim($value, '/');
                 break;
+            case 'file_dir':
+                $value = rtrim(Application::ROOT_DIR . '/' . $value, '/');
+                break;
             case 'debugging_enabled':
                 $value = (bool)$value;
         }
@@ -62,29 +66,29 @@ class Configuration {
         }
     }
 
-    private function getDatabaseValue(string $property) {
+    protected function getDatabaseValue(string $property) {
         if($this->db_con == null) {
-            // TODO: Throw error
+            Application::instance()->logger->error('Tried to get database value but no database initialized.', array('property' => $property));
             return false;
         }
 
         return $this->db_con->readConfigValue($property) ?? false;
     }
 
-    private function getIniValue(string $property) {
+    protected function getIniValue(string $property) {
         return $this->ini[$property];
     }
 
-    private function setDatabaseValue(string $property, $value) : bool {
+    protected function setDatabaseValue(string $property, $value) : bool {
         if($this->db_con == null) {
-            // TODO: Throw error
+            Application::instance()->logger->error('Tried to write database value but no database initialized.', array('property' => $property, 'value' => $value));
             return false;
         }
 
         return $this->db_con->writeConfigValue($property, $value);
     }
 
-    private function setIniValue(string $property, $value) : bool {
+    protected function setIniValue(string $property, $value) : bool {
         $this->ini[$property] = (string)$value;
         return $this->ini->save();
     }

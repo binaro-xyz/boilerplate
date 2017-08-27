@@ -21,14 +21,24 @@
         {
             "type": "pear",
             "url": "https://pear.php.net"
+        },
+        {
+            "type": "vcs",
+            "url": "https://git.my-server.in/baltpeter/password-hashing-pbkdf2.git"
         }
     ],
     "require": {
         "php": ">=7.0.0",
         "myclabs/php-enum": "^1.4",
-        "pear-pear.php.net/Config_Lite": "*"
+        "pear-pear.php.net/Config_Lite": "*",
+        "mindplay/composer-locator": "^2.1",
+        "baltpeter/password-hashing-pbkdf2": "*",
+        "monolog/monolog": "^1.22"
     },
     "autoload": {
+        "files": [
+            "lib/boilerplate/helpers.php"
+        ],
         "psr-4": {
             "boilerplate\\": "lib/boilerplate/",
             "boilerplate\\Core\\": "lib/boilerplate/Core/",
