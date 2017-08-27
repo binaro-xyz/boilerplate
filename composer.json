@@ -33,7 +33,8 @@
         "pear-pear.php.net/Config_Lite": "*",
         "mindplay/composer-locator": "^2.1",
         "baltpeter/password-hashing-pbkdf2": "*",
-        "monolog/monolog": "^1.22"
+        "monolog/monolog": "^1.22",
+        "symfony/http-foundation": "^3.3"
     },
     "autoload": {
         "files": [
