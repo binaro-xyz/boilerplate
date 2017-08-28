@@ -12,12 +12,15 @@ class Router {
     protected static $controller_namespace = '';
     protected static $route_prefix = '';
     protected static $current_route = array();
+    protected static $current_request;
 
     /**
      * @param Request|null $request If no Request object is passed, the current request is used
      */
     public static function handle(Request $request = null) {
         if($request === null) $request = Request::createFromGlobals();
+
+        Router::$current_request = $request;
 
         $route = Router::matchRequest($request);
         Router::$current_route = $route;
@@ -163,6 +166,8 @@ class Router {
     public static function currentRouteName() : string { return Router::$current_route['name']; }
     public static function currentRouteUri() : string { return Router::$current_route['uri']; }
     public static function currentRouteParameters() : array { return Router::$current_route['parameters']; }
+
+    public static function getCurrentRequest() : Request { return Router::$current_request ?? Request::createFromGlobals(); }
 
     /*
      * Helper methods for adding routes
