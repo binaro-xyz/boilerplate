@@ -37,17 +37,22 @@ class Router {
         $response->send();
     }
 
-    protected static function addRoute(string $method, string $uri, \Closure $callback) : bool {
+    protected static function addRoute(string $method, string $uri, \Closure $callback, string $name = null) : bool {
         $method = strtoupper($method);
         if(!in_array($method, Router::ALLOWED_METHODS)) {
-            Application::instance()->logger->addError('Tried to setup route using invalid method: "' . $method . '"', array('route' => func_get_args()));
+            Application::instance()->logger->debug('Tried to setup route using invalid method: "' . $method . '"', array('route' => func_get_args()));
             return false;
         }
 
         $uri = trim($uri, '/');
         $regex = '%^' . preg_replace('/\\\{.+?\\\}/', '([^/]+)', preg_quote($uri, '%')) . '$%';
 
-        Router::$routes[$method][] = array('regex' => $regex, 'uri' => $uri, 'callback' => $callback);
+        if($name === null) $name = uniqid();
+        if(@in_array($name, array_keys(array_merge(...array_values(Router::$routes))))) {
+            Application::instance()->logger->debug('Tried to setup named route "' . $name . '" but name already exists.', array('route' => func_get_args()));
+            return false;
+        }
+        Router::$routes[$method][$name] = array('regex' => $regex, 'uri' => $uri, 'callback' => $callback);
 
         return true;
     }
@@ -68,15 +73,29 @@ class Router {
         return array('callback' => function() { return new Response('404', Response::HTTP_NOT_FOUND); });
     }
 
+    protected static function getRouteWithName(string $name) {
+        return @array_merge(...array_values(Router::$routes))[$name];
+    }
+
+    // $parameters has to be: array('param_1' => $value_1, 'param_2' => $value_2) and `param_n` has to be the exact name given in the route definition
+    public static function getRouteUrl(string $route_name, array $parameters = array(), bool $relative = true) : string {
+        $route = Router::getRouteWithName($route_name);
+        $url = $route['uri'];
+        foreach($parameters as $key => $value) {
+            $url = str_replace("{{$key}}", $value, $url);
+        }
+        return $relative ? $url : Application::instance()->config->get(ConfigurationOption::BASE_URL) . '/' . $url;
+    }
+
     /*
      * Helper methods for adding routes
      */
-    public static function get(string $uri, \Closure $callback) : bool { return Router::addRoute('GET', $uri, $callback); }
-    public static function post(string $uri, \Closure $callback) : bool { return Router::addRoute('POST', $uri, $callback); }
-    public static function put(string $uri, \Closure $callback) : bool { return Router::addRoute('PUT', $uri, $callback); }
-    public static function patch(string $uri, \Closure $callback) : bool { return Router::addRoute('PATCH', $uri, $callback); }
-    public static function delete(string $uri, \Closure $callback) : bool { return Router::addRoute('DELETE', $uri, $callback); }
-    public static function options(string $uri, \Closure $callback) : bool { return Router::addRoute('OPTIONS', $uri, $callback); }
+    public static function get(string $uri, \Closure $callback, string $name = null) : bool { return Router::addRoute('GET', $uri, $callback, $name); }
+    public static function post(string $uri, \Closure $callback, string $name = null) : bool { return Router::addRoute('POST', $uri, $callback, $name); }
+    public static function put(string $uri, \Closure $callback, string $name = null) : bool { return Router::addRoute('PUT', $uri, $callback, $name); }
+    public static function patch(string $uri, \Closure $callback, string $name = null) : bool { return Router::addRoute('PATCH', $uri, $callback, $name); }
+    public static function delete(string $uri, \Closure $callback, string $name = null) : bool { return Router::addRoute('DELETE', $uri, $callback, $name); }
+    public static function options(string $uri, \Closure $callback, string $name = null) : bool { return Router::addRoute('OPTIONS', $uri, $callback, $name); }
 
     public static function any(string $uri, \Closure $callback) : bool { return Router::match(Router::ALLOWED_METHODS, $uri, $callback); }
 
