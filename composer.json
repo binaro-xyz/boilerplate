@@ -34,7 +34,8 @@
         "mindplay/composer-locator": "^2.1",
         "baltpeter/password-hashing-pbkdf2": "*",
         "monolog/monolog": "^1.22",
-        "symfony/http-foundation": "^3.3"
+        "symfony/http-foundation": "^3.3",
+        "twig/twig": "^2.0"
     },
     "autoload": {
         "files": [

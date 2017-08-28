@@ -4,7 +4,6 @@ namespace boilerplate\Core;
 
 use boilerplate\DataIo\DatabaseConnection;
 use boilerplate\Utility\Singleton;
-use Monolog\Handler\BrowserConsoleHandler;
 use Monolog\Logger;
 
 // PHP doesn't allow the use of expressions in the definition of a const, therefore we have to use this
@@ -27,10 +26,12 @@ class Application extends Singleton {
     public $db_con;
     public $config;
     public $logger;
+    public $renderer;
 
     public function __construct() {
         $this->db_con = new DatabaseConnection();
         $this->config = new Configuration(true, $this->db_con);
         $this->logger = new Logger('default');
+        $this->renderer = new Renderer($this->config->get(ConfigurationOption::VIEW_DIR));
     }
 }
