@@ -26,4 +26,8 @@ class Renderer {
     public function render(string $view, array $variables = array()) : string {
         return $this->twig_env->render($view, $variables);
     }
+
+    public function viewExists(string $view) : bool {
+        return is_file(Application::instance()->config->get(ConfigurationOption::VIEW_DIR) . '/' . ltrim($view, '/'));
+    }
 }

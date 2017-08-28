@@ -45,7 +45,8 @@ class Configuration {
             case 'base_url':
                 $value = rtrim($value, '/');
                 break;
-            case 'file_dir':
+            case 'file_dir': // fallthrough intentional
+            case 'view_dir':
                 $value = rtrim(Application::ROOT_DIR . '/' . $value, '/');
                 break;
             case 'debugging_enabled':
