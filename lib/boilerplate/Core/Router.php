@@ -30,7 +30,7 @@ class Router {
         }
         else {
             // TODO: 500
-            return array('callback' => function() {return '500';});
+            $response = new Response('500', Response::HTTP_INTERNAL_SERVER_ERROR, array('Content-Type' => 'text/html'));
         }
 
         $response->prepare($request);
@@ -65,7 +65,7 @@ class Router {
         }
 
         // TODO: 404
-        return array('callback' => function() {return '404';});
+        return array('callback' => function() { return new Response('404', Response::HTTP_NOT_FOUND); });
     }
 
     /*
