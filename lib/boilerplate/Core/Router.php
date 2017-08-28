@@ -10,12 +10,13 @@ class Router {
 
     protected static $routes = array();
     protected static $route_prefix = '';
+    protected static $current_route = array();
 
     public static function handle($request = null) {
         if($request === null) $request = Request::createFromGlobals();
 
         $route = Router::matchRequest($request);
-        if(!is_array(@$route['parameters'])) $route['parameters'] = array();
+        Router::$current_route = $route;
         $content = $route['callback'](...$route['parameters']);
 
         $response = null;
@@ -64,16 +65,17 @@ class Router {
         $path = trim($request->getPathInfo(), '/');
         $parameters = array();
 
-        foreach(Router::$routes[$request->getMethod()] as $route) {
+        foreach(Router::$routes[$request->getMethod()] as $name => $route) {
             if(preg_match($route['regex'], $path, $parameters) === 1) {
                 array_shift($parameters);
                 $route['parameters'] = $parameters;
+                $route['name'] = $name;
                 return $route;
             };
         }
 
         // TODO: 404
-        return array('callback' => function() { return new Response('404', Response::HTTP_NOT_FOUND); });
+        return array('callback' => function() { return new Response('404', Response::HTTP_NOT_FOUND); }, 'parameters' => array());
     }
 
     protected static function getRouteWithName(string $name) {
@@ -94,6 +96,11 @@ class Router {
 
     public static function startRoutePrefix(string $prefix) { Router::$route_prefix = empty(trim($prefix)) ? '' : trim($prefix, '/'); }
     public static function stopRoutePrefix() { Router::$route_prefix = ''; }
+
+    public static function currentRoute() : array { return Router::$current_route; }
+    public static function currentRouteName() : string { return Router::$current_route['name']; }
+    public static function currentRouteUri() : string { return Router::$current_route['uri']; }
+    public static function currentRouteParameters() : array { return Router::$current_route['parameters']; }
 
     /*
      * Helper methods for adding routes
