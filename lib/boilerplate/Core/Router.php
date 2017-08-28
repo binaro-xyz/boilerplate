@@ -9,6 +9,7 @@ class Router {
     const ALLOWED_METHODS = array('GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS');
 
     protected static $routes = array();
+    protected static $route_prefix = '';
 
     public static function handle($request = null) {
         if($request === null) $request = Request::createFromGlobals();
@@ -45,6 +46,8 @@ class Router {
         }
 
         $uri = trim($uri, '/');
+        $uri = Router::$route_prefix == '' ? $uri : Router::$route_prefix . '/' . $uri;
+
         $regex = '%^' . preg_replace('/\\\{.+?\\\}/', '([^/]+)', preg_quote($uri, '%')) . '$%';
 
         if($name === null) $name = uniqid();
@@ -86,6 +89,11 @@ class Router {
         }
         return $relative ? $url : Application::instance()->config->get(ConfigurationOption::BASE_URL) . '/' . $url;
     }
+
+    public static function getRoutes() : array { return Router::$routes; }
+
+    public static function startRoutePrefix(string $prefix) { Router::$route_prefix = empty(trim($prefix)) ? '' : trim($prefix, '/'); }
+    public static function stopRoutePrefix() { Router::$route_prefix = ''; }
 
     /*
      * Helper methods for adding routes
