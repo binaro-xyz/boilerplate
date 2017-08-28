@@ -9,6 +9,7 @@ class Router {
     const ALLOWED_METHODS = array('GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS');
 
     protected static $routes = array();
+    protected static $controller_namespace = '';
     protected static $route_prefix = '';
     protected static $current_route = array();
 
@@ -20,10 +21,26 @@ class Router {
 
         $route = Router::matchRequest($request);
         Router::$current_route = $route;
-        $content = $route['callback'](...$route['parameters']);
+
+        $content = null;
+        if(is_callable($route['callback'])) $content = $route['callback'](...$route['parameters']);
+        elseif(is_string($route['callback'])) {
+            $preg = array();
+            if(preg_match('/^(.+)@(.+)$/', $route['callback'], $preg) == 1) {
+                list(,$class, $method) = $preg;
+
+                if(!class_exists($class)) $class = Router::$controller_namespace . '\\' . $class;
+
+                if(class_exists($class)) {
+                    $instance = new $class();
+                    if(method_exists($instance, $method)) {
+                        $content = $instance->$method(...$route['parameters']);
+                    }
+                }
+            }
+        }
 
         $response = null;
-
         if(is_string($content)) {
             $response = new Response($content, Response::HTTP_OK, array('Content-Type' => 'text/html'));
         }
@@ -50,12 +67,17 @@ class Router {
      *          `Router::ALLOWED_METHODS`. Case-insensitive.
      * @param string $uri The URI the route should match. You can include parameters in curly brackets. (e.g. `home` or
      *          `post/{post_id}/comment/{comment_id}`)
-     * @param \Closure $callback
+     * @param callable|string $callback A function that returns the value for the response. This can either be a callable
+     *          (an anonymous function, the name of a function, `'ClassName::staticMethodName'` etc.) or a string in the
+     *          format `'ClassName@nonStaticFunction'` if you want to call a controller. It the latter case, the class will
+     *          be instantiated automatically but its constructor *cannot* have any arguments.
+     *          The function can return a string (which will be outputted as text/html), an array (which will be outputted
+     *          as JSON) or a Response object (which will be outputted directly).
      * @param string|null $name An (optional) name for the route that can be used later to generate a URL. If none is given,
      *          `uniqid()` is used.
      * @return bool Whether the creation of the route was successful or failed (e.g. because the route name is taken)
      */
-    protected static function addRoute(string $method, string $uri, \Closure $callback, string $name = null) : bool {
+    protected static function addRoute(string $method, string $uri, $callback, string $name = null) : bool {
         $method = strtoupper($method);
         if(!in_array($method, Router::ALLOWED_METHODS)) {
             Application::instance()->logger->debug('Tried to setup route using invalid method: "' . $method . '"', array('route' => func_get_args()));
@@ -125,6 +147,18 @@ class Router {
     public static function startRoutePrefix(string $prefix) { Router::$route_prefix = empty(trim($prefix)) ? '' : trim($prefix, '/'); }
     public static function stopRoutePrefix() { Router::$route_prefix = ''; }
 
+    /**
+     * Set a default namespace for Controllers that are used as route callbacks.
+     *
+     * If a class without the namespace exists, that will be called regardless of this setting. If you want to force the
+     * use of the namespaced class, you have to pass the namespace directly to the route.
+     *
+     * Calling this function without an argument will reset the default namespace.
+     *
+     * @param string $namespace
+     */
+    public static function setControllerNamespace(string $namespace = '') { Router::$controller_namespace = empty(trim($namespace)) ? '' : rtrim($namespace, '\\'); }
+
     public static function currentRoute() : array { return Router::$current_route; }
     public static function currentRouteName() : string { return Router::$current_route['name']; }
     public static function currentRouteUri() : string { return Router::$current_route['uri']; }
@@ -133,22 +167,22 @@ class Router {
     /*
      * Helper methods for adding routes
      */
-    public static function get(string $uri, \Closure $callback, string $name = null) : bool { return Router::addRoute('GET', $uri, $callback, $name); }
-    public static function post(string $uri, \Closure $callback, string $name = null) : bool { return Router::addRoute('POST', $uri, $callback, $name); }
-    public static function put(string $uri, \Closure $callback, string $name = null) : bool { return Router::addRoute('PUT', $uri, $callback, $name); }
-    public static function patch(string $uri, \Closure $callback, string $name = null) : bool { return Router::addRoute('PATCH', $uri, $callback, $name); }
-    public static function delete(string $uri, \Closure $callback, string $name = null) : bool { return Router::addRoute('DELETE', $uri, $callback, $name); }
-    public static function options(string $uri, \Closure $callback, string $name = null) : bool { return Router::addRoute('OPTIONS', $uri, $callback, $name); }
+    public static function get(string $uri, $callback, string $name = null) : bool { return Router::addRoute('GET', $uri, $callback, $name); }
+    public static function post(string $uri, $callback, string $name = null) : bool { return Router::addRoute('POST', $uri, $callback, $name); }
+    public static function put(string $uri, $callback, string $name = null) : bool { return Router::addRoute('PUT', $uri, $callback, $name); }
+    public static function patch(string $uri, $callback, string $name = null) : bool { return Router::addRoute('PATCH', $uri, $callback, $name); }
+    public static function delete(string $uri, $callback, string $name = null) : bool { return Router::addRoute('DELETE', $uri, $callback, $name); }
+    public static function options(string $uri, $callback, string $name = null) : bool { return Router::addRoute('OPTIONS', $uri, $callback, $name); }
 
     /**
      * Let the route match all methods.
      * You cannot pass a $name to this function because route names have to be unique for every method.
      *
      * @param string $uri
-     * @param \Closure $callback
+     * @param callable|string $callback
      * @return bool
      */
-    public static function any(string $uri, \Closure $callback) : bool { return Router::match(Router::ALLOWED_METHODS, $uri, $callback); }
+    public static function any(string $uri, $callback) : bool { return Router::match(Router::ALLOWED_METHODS, $uri, $callback); }
 
     /**
      * Let the route match all methods given in $methods.
@@ -156,10 +190,10 @@ class Router {
      *
      * @param string[] $methods An array of all methods to match (e.g. array('GET', 'POST'))
      * @param string $uri
-     * @param \Closure $callback
+     * @param callable|string $callback
      * @return bool
      */
-    public static function match(array $methods, string $uri, \Closure $callback) : bool {
+    public static function match(array $methods, string $uri, $callback) : bool {
         foreach($methods as $method) if(!Router::addRoute($method, $uri, $callback)) return false;
         return true;
     }
