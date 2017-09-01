@@ -32,8 +32,6 @@ class Router {
             if(preg_match('/^(.+)@(.+)$/', $route['callback'], $preg) == 1) {
                 list(,$class, $method) = $preg;
 
-                if(!class_exists($class)) $class = Router::$controller_namespace . '\\' . $class;
-
                 if(class_exists($class)) {
                     $instance = new $class();
                     if(method_exists($instance, $method)) {
@@ -92,6 +90,8 @@ class Router {
 
         $regex = '%^' . preg_replace('/\\\{.+?\\\}/', '([^/]+)', preg_quote($uri, '%')) . '$%';
 
+        if(is_string($callback)) $callback = (Router::$controller_namespace == '' ? '' : Router::$controller_namespace . '\\') . $callback;
+
         if(empty($name)) $name = uniqid();
         if(@in_array($name, array_keys(array_merge(...array_values(Router::$routes))))) {
             Application::instance()->logger->debug('Tried to setup named route "' . $name . '" but name already exists.', array('route' => func_get_args()));
@@ -103,7 +103,7 @@ class Router {
     }
 
     protected static function matchRequest(Request $request) : array {
-        $path = trim($request->getPathInfo(), '/');
+        $path = urldecode(trim($request->getPathInfo(), '/'));
         $parameters = array();
 
         foreach(Router::$routes[$request->getMethod()] as $name => $route) {
@@ -119,7 +119,7 @@ class Router {
         return array('callback' => function() { return new Response('404', Response::HTTP_NOT_FOUND); }, 'parameters' => array());
     }
 
-    protected static function getRouteWithName(string $name){
+    protected static function getRouteWithName(string $name) {
         return @array_merge(...array_values(Router::$routes))[$name];
     }
 
@@ -151,12 +151,9 @@ class Router {
     public static function stopRoutePrefix() { Router::$route_prefix = ''; }
 
     /**
-     * Set a default namespace for Controllers that are used as route callbacks.
+     * Set a namespace for controllers (and static class functions) that are used as route callbacks.
      *
-     * If a class without the namespace exists, that will be called regardless of this setting. If you want to force the
-     * use of the namespaced class, you have to pass the namespace directly to the route.
-     *
-     * Calling this function without an argument will reset the default namespace.
+     * Calling this function without an argument will reset the namespace to none.
      *
      * @param string $namespace
      */
@@ -187,7 +184,7 @@ class Router {
      * @param callable|string $callback
      * @return bool
      */
-    public static function any(string $uri, $callback) : bool { return Router::match(Router::ALLOWED_METHODS, $uri, $callback); }
+    public static function any(string $uri, $callback) : bool { return Router::many(Router::ALLOWED_METHODS, $uri, $callback); }
 
     /**
      * Let the route match all methods given in $methods.
@@ -198,7 +195,7 @@ class Router {
      * @param callable|string $callback
      * @return bool
      */
-    public static function match(array $methods, string $uri, $callback) : bool {
+    public static function many(array $methods, string $uri, $callback) : bool {
         foreach($methods as $method) if(!Router::addRoute($method, $uri, $callback)) return false;
         return true;
     }
