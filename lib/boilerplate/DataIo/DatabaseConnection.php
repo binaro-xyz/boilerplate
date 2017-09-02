@@ -4,7 +4,7 @@ namespace boilerplate\DataIo;
 
 use boilerplate\Core\Application;
 use boilerplate\Core\Configuration;
-use boilerplate\Core\ConfigurationOption;
+use boilerplate\Utility\ConfigurationOption;
 
 class DatabaseConnection {
     protected $pdo;

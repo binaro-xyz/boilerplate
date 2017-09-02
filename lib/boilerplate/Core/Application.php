@@ -3,6 +3,7 @@
 namespace boilerplate\Core;
 
 use boilerplate\DataIo\DatabaseConnection;
+use boilerplate\Utility\ConfigurationOption;
 use boilerplate\Utility\Singleton;
 use Monolog\Logger;
 

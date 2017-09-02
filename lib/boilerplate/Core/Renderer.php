@@ -3,6 +3,8 @@
 namespace boilerplate\Core;
 
 
+use boilerplate\Utility\ConfigurationOption;
+
 class Renderer {
     private $twig_loader;
     private $twig_env;
