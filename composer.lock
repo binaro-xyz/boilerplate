@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "455ca4612128a019e423cb6c1c41f459",
+    "content-hash": "9de69ba4894461d8c2ef80f4eaead69d",
     "packages": [
         {
             "name": "baltpeter/password-hashing-pbkdf2",
@@ -12,7 +12,7 @@
             "source": {
                 "type": "git",
                 "url": "https://git.my-server.in/baltpeter/password-hashing-pbkdf2.git",
-                "reference": "23ce00208e8c5c7fa963e681443506a32907af07"
+                "reference": "79c44d88de77873cf22fb13a1575d679d0a6ef94"
             },
             "type": "library",
             "autoload": {
@@ -457,7 +457,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.0.0"
+        "php": ">=7.1"
     },
     "platform-dev": []
 }

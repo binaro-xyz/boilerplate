@@ -17,7 +17,7 @@ class Router {
     /**
      * @param Request|null $request If no Request object is passed, the current request is used
      */
-    public static function handle(Request $request = null) {
+    public static function handle(Request $request = null) : void {
         if($request === null) $request = Request::createFromGlobals();
 
         Router::$current_request = $request;
@@ -119,7 +119,7 @@ class Router {
         return array('callback' => function() { return new Response('404', Response::HTTP_NOT_FOUND); }, 'parameters' => array());
     }
 
-    protected static function getRouteWithName(string $name) {
+    protected static function getRouteWithName(string $name) : ?array {
         return @array_merge(...array_values(Router::$routes))[$name];
     }
 
@@ -147,8 +147,8 @@ class Router {
      *
      * @param string $prefix
      */
-    public static function startRoutePrefix(string $prefix) { Router::$route_prefix = empty(trim($prefix)) ? '' : trim($prefix, '/'); }
-    public static function stopRoutePrefix() { Router::$route_prefix = ''; }
+    public static function startRoutePrefix(string $prefix) : void { Router::$route_prefix = empty(trim($prefix)) ? '' : trim($prefix, '/'); }
+    public static function stopRoutePrefix() : void { Router::$route_prefix = ''; }
 
     /**
      * Set a namespace for controllers (and static class functions) that are used as route callbacks.
@@ -157,12 +157,12 @@ class Router {
      *
      * @param string $namespace
      */
-    public static function setControllerNamespace(string $namespace = '') { Router::$controller_namespace = empty(trim($namespace)) ? '' : rtrim($namespace, '\\'); }
+    public static function setControllerNamespace(string $namespace = '') : void { Router::$controller_namespace = empty(trim($namespace)) ? '' : rtrim($namespace, '\\'); }
 
-    public static function currentRoute() : array { return Router::$current_route; }
-    public static function currentRouteName() : string { return Router::$current_route['name']; }
-    public static function currentRouteUri() : string { return Router::$current_route['uri']; }
-    public static function currentRouteParameters() : array { return Router::$current_route['parameters']; }
+    public static function currentRoute() : ?array { return Router::$current_route; }
+    public static function currentRouteName() : ?string { return Router::$current_route['name']; }
+    public static function currentRouteUri() : ?string { return Router::$current_route['uri']; }
+    public static function currentRouteParameters() : ?array { return Router::$current_route['parameters']; }
 
     public static function getCurrentRequest() : Request { return Router::$current_request ?? Request::createFromGlobals(); }
 
