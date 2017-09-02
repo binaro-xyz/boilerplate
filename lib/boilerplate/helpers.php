@@ -1,6 +1,4 @@
 <?php
-// TODO: Discussion, should we rather follow our own function naming guidelines here or the way PHP names the functions, e.g. varDumpPre() or var_dump_pre()?
-
 function varDumpPre($expression) {
     echo '<pre>';
     var_dump($expression);
@@ -20,10 +18,14 @@ function printRPre($expression) {
     echo '<pre>' . print_r($expression, true) . '</pre>';
 }
 
-// use for navigation menus: determine if a certain page is active and add a class accordingly
-function activePageClass(string $filename) : string {
-    if(strpos(basename($_SERVER['PHP_SELF']), $filename) !== false) {
-        return 'class="active"';
-    }
-    return '';
+// Helpers for the Router
+
+function route(string $route_name, array $parameters = array(), $relative = true) : string {
+    return \boilerplate\Core\Router::getRouteUrl($route_name, $parameters, $relative);
+}
+
+// Helpers for the Renderer
+
+function view(string $view, array $variables = array()) : string {
+    return \boilerplate\Core\Application::instance()->renderer->render($view, $variables);
 }

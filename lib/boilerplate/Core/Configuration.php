@@ -14,6 +14,7 @@ class ConfigurationOption extends Enum {
 
     const BASE_URL = array('property' => 'base_url', 'source' => 'db');
     const FILE_DIR = array('property' => 'file_dir', 'source' => 'db');
+    const VIEW_DIR = array('property' => 'view_dir', 'source' => 'db');
 }
 
 class Configuration {
@@ -44,7 +45,8 @@ class Configuration {
             case 'base_url':
                 $value = rtrim($value, '/');
                 break;
-            case 'file_dir':
+            case 'file_dir': // fallthrough intentional
+            case 'view_dir':
                 $value = rtrim(Application::ROOT_DIR . '/' . $value, '/');
                 break;
             case 'debugging_enabled':

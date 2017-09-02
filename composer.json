@@ -13,7 +13,7 @@
         {
             "name": "Lorenz Sieben",
             "email": "me@lorenz-sieben.com",
-            "homepage": "http://lorenz-sieben.com",
+            "homepage": "https://lorenz-sieben.com",
             "role": "Developer"
         }
     ],
@@ -33,7 +33,9 @@
         "pear-pear.php.net/Config_Lite": "*",
         "mindplay/composer-locator": "^2.1",
         "baltpeter/password-hashing-pbkdf2": "*",
-        "monolog/monolog": "^1.22"
+        "monolog/monolog": "^1.22",
+        "symfony/http-foundation": "^3.3",
+        "twig/twig": "^2.0"
     },
     "autoload": {
         "files": [
