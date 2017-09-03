@@ -2,11 +2,14 @@
 
 namespace boilerplate\DataType;
 
-
 use boilerplate\Core\Application;
 use boilerplate\Utility\ConfigurationOption;
+use boilerplate\Utility\ProvidesResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
-class File {
+class File implements ProvidesResponse {
     public $id;
     public $filename;
     public $extension;
@@ -18,6 +21,12 @@ class File {
 
     protected $db_con;
     protected $config;
+
+    /**
+     * @var ?string If this is set to null and the file is passed to a route, the file will be shown in the user's browser;
+     *      if this is set to a string, the file will be downloaded with that file name instead
+     */
+    protected $download_file_name = null;
 
     /*
      * these are the different constructors, implemented via static methods due to PHP's limitations
@@ -148,30 +157,43 @@ class File {
      * actual object methods
      */
 
+    /**
+     * Use this in a route callback to download the file instead of viewing it (i.e. `Content-Disposition` will be set to
+     * `attachment instead of `inline`.
+     *`
+     * Use like this: `return $file->download($download_file_name);`
+     *
+     * @param string $download_file_name Sets the filename of the downloaded file, the default value is the name stored in the database
+     * @return File
+     */
+    public function download(string $download_file_name = '') : File {
+        $return_file = clone $this;
+        $return_file->download_file_name = $download_file_name == '' ? $this->filename . '.' . $this->extension : $download_file_name;
+        return $return_file;
+    }
+
+    /**
+     * Returns an HTTP response for this file for use in the Router.
+     *
+     * To serve the file to the user's browser, use a route callback that simply returns an instance of the file. This will
+     * view the file (i.e. use a `Content-Disposition` of `inline`). To download the file (i.e. `attachment`), use this
+     * instead: `return $file->download($download_file_name);`.
+     *
+     * @return Response
+     */
+    public function getResponse(): Response {
+        $file = $this->getFilePath();
+
+        return (new BinaryFileResponse($file, Response::HTTP_OK))
+            ->setContentDisposition($this->download_file_name === null ? ResponseHeaderBag::DISPOSITION_INLINE : ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+                $this->download_file_name);
+    }
+
     public function delete() : bool {
         $path = File::getFullFilePath($this->uuid, $this->context);
         $this->db_con->deleteFileWithId($this->id);
         unlink($path);
         return true;
-    }
-
-    // if $download_file_name is an empty string, the original file name at the time of the upload will be used
-    public function download(string $download_file_name = '') {
-        $file = $this->getFilePath();
-        $download_file_name = $download_file_name == '' ? $this->filename . '.' . $this->extension : $download_file_name;
-
-        header('Content-Type: ' . finfo_file(finfo_open(FILEINFO_MIME_TYPE), $file));
-        header('Content-Disposition: attachment; filename="' . $download_file_name . '"');
-        header('Content-Length: ' . filesize($file));
-        readfile($file);
-    }
-
-    public function view() {
-        $file = $this->getFilePath();
-
-        header('Content-Type: ' . finfo_file(finfo_open(FILEINFO_MIME_TYPE), $file));
-        header('Content-Length: ' . filesize($file));
-        readfile($file);
     }
 
     public function getFilePath() : string {
