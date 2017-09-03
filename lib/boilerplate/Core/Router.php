@@ -159,10 +159,10 @@ class Router {
      */
     public static function setControllerNamespace(string $namespace = '') : void { Router::$controller_namespace = empty(trim($namespace)) ? '' : rtrim($namespace, '\\'); }
 
-    public static function currentRoute() : ?array { return Router::$current_route; }
-    public static function currentRouteName() : ?string { return Router::$current_route['name']; }
-    public static function currentRouteUri() : ?string { return Router::$current_route['uri']; }
-    public static function currentRouteParameters() : ?array { return Router::$current_route['parameters']; }
+    public static function currentRoute() : array { return Router::$current_route; }
+    public static function currentRouteName() : ?string { return @Router::$current_route['name']; }
+    public static function currentRouteUri() : ?string { return @Router::$current_route['uri']; }
+    public static function currentRouteParameters() : ?array { return @Router::$current_route['parameters']; }
 
     public static function getCurrentRequest() : Request { return Router::$current_request ?? Request::createFromGlobals(); }
 
