@@ -2,6 +2,7 @@
 
 namespace boilerplate\Core;
 
+use boilerplate\Utility\ConfigurationOption;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 

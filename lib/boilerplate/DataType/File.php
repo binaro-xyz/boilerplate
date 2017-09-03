@@ -4,7 +4,7 @@ namespace boilerplate\DataType;
 
 
 use boilerplate\Core\Application;
-use boilerplate\Core\ConfigurationOption;
+use boilerplate\Utility\ConfigurationOption;
 
 class File {
     public $id;
