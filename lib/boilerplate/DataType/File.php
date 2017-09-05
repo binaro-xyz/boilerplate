@@ -159,16 +159,16 @@ class File implements ProvidesResponse {
 
     /**
      * Use this in a route callback to download the file instead of viewing it (i.e. `Content-Disposition` will be set to
-     * `attachment instead of `inline`.
-     *`
+     * `attachment` instead of `inline`).
+     *
      * Use like this: `return $file->download($download_file_name);`
      *
      * @param string $download_file_name Sets the filename of the downloaded file, the default value is the name stored in the database
      * @return File
      */
-    public function download(string $download_file_name = '') : File {
+    public function download(string $download_file_name = null) : File {
         $return_file = clone $this;
-        $return_file->download_file_name = $download_file_name == '' ? $this->filename . '.' . $this->extension : $download_file_name;
+        $return_file->download_file_name = $download_file_name ?? $this->filename . '.' . $this->extension;
         return $return_file;
     }
 
