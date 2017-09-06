@@ -3,6 +3,8 @@
 namespace boilerplate\Core;
 
 use boilerplate\Utility\ConfigurationOption;
+use boilerplate\Utility\ProvidesResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -42,23 +44,25 @@ class Router {
             }
         }
 
+        $response = Router::makeResponseForContent($content);
+
+        $response->prepare($request);
+        $response->send();
+    }
+
+    protected static function makeResponseForContent($content) : ?Response {
         $response = null;
-        if(is_string($content)) {
-            $response = new Response($content, Response::HTTP_OK, array('Content-Type' => 'text/html'));
-        }
-        elseif(is_array($content)) {
-            $response = new Response(json_encode($content), Response::HTTP_OK, array('Content-Type' => 'application/json'));
-        }
-        elseif($content instanceof Response) {
-            $response = $content;
-        }
+
+        if(is_string($content)) $response = new Response($content, Response::HTTP_OK, array('Content-Type' => 'text/html'));
+        elseif(is_array($content)) $response = new JsonResponse($content);
+        elseif($content instanceof ProvidesResponse) $response = $content->getResponse();
+        elseif($content instanceof Response) $response = $content;
         else {
             // TODO: 500
             $response = new Response('500', Response::HTTP_INTERNAL_SERVER_ERROR, array('Content-Type' => 'text/html'));
         }
 
-        $response->prepare($request);
-        $response->send();
+        return $response;
     }
 
     /**
